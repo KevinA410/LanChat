@@ -1,0 +1,24 @@
+#main_container {
+    min-height: calc(100vh - 88px);
+}
+
+.connected-dot {
+    width: 8px;
+    height: 8px;
+    margin-bottom: 2px;
+    border-radius: 50%;
+    background-color: green;
+    margin-right: 5px;
+    display: inline-block;
+}
+
+#left,
+#right {
+    min-height: calc(100vh - 88px);
+    /* background-color: green;  */
+}
+
+#messages {
+    /* background-color: grey; */
+    min-height: calc(100vh - 235px);
+}
