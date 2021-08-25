@@ -1,5 +1,5 @@
 {
-    "address": "192.168.0.110",
+    "address": "192.168.0.115",
     "port": "9000",
-    "wsURL": "ws://192.168.0.110:9000/sockets_server.php"
+    "wsURL": "ws://192.168.0.115:9000/sockets_server.php"
 }

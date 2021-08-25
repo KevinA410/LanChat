@@ -1,108 +1,93 @@
 <?php
-include_once('socket_lib.php');
-$master_info = json_decode(file_get_contents("../js/master.json"));
+include_once('socket_lib.php'); // Include socket librery
+$master_info = json_decode(file_get_contents("../js/master.json")); // Get socket master info from Json
 
-// Create & configure socket server (master)
-$master = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-socket_set_option($master, SOL_SOCKET, SO_REUSEADDR, true);
-socket_bind($master, $master_info->address, $master_info->port);
-socket_listen($master);
+$master = socket_create(AF_INET, SOCK_STREAM, SOL_TCP); // Create socket TCP
+socket_set_option($master, SOL_SOCKET, SO_REUSEADDR, true); // Enable reusable port
+socket_bind($master, $master_info->address, $master_info->port); // Connect port to master info
+socket_listen($master); // Set socket to listen requests
 
-while (true) {
+while (true) { // Keep run
     $copy_clients = $connected_clients;
     $null = NULL;
     
     array_push($copy_clients, $master);
 
-    // Attend new connection request
+    // Writes clients who made a request in $copy_clients
     socket_select($copy_clients, $null, $null, 0, 10);
 
+    // If there's a new connection request
     if(in_array($master, $copy_clients)){
-        // Create & connect new socket
-        $new_socket = socket_accept($master);
-        $header = socket_read($new_socket, 1024);
-        perform_handshaking($header, $new_socket, $master_info->address, $master_info->port);
+        $new_socket = socket_accept($master); // Create new client socket
+        $header = socket_read($new_socket, 1024); // Get header
+        socket_handshaking($header, $new_socket, $master_info->address, $master_info->port); // Link to master
 
-        // Get all connected ip's
-        socket_getpeername($new_socket, $new_address);
-        $clients_addresses = socket_getConnectedAddresses();
-        array_push($clients_addresses, $new_address);
+        socket_getpeername($new_socket, $new_address); // Get ip of new socket
+        $clients_addresses = socket_getClientsAddresses(); //Get ip of connected clients
+        array_push($clients_addresses, $new_address); // Add new ip from clients ip array
 
         // New user recieves all connected ips
-        $response = socket_formatResponse(array(
+        $response = socket_encodeResponse(array(
             'command' => 'connected_users',
             'addresses' => $clients_addresses
         ));
 
-        socket_write($new_socket, $response, strlen($response));
+        socket_write($new_socket, $response, strlen($response)); // Send response
         
         // Already connected users recieve only the new connection's ip
-        $response = socket_formatResponse(array(
+        $response = socket_encodeResponse(array(
             'command' => 'new_connection',
             'address' => $new_address
         ));
 
-        socket_sendForAll($response);
-    
-        // Add new user to connected clients array
-        array_push($connected_clients, $new_socket);
-        
-        // Remove master from array
-        $index = array_search($master, $copy_clients);
-        unset($copy_clients[$index]);
+        socket_sendForAll($response); // Send response for all connected users
+        array_push($connected_clients, $new_socket); // Add new user to connected clients array
+        socket_remove($master, $copy_clients); // Remove master from $copy_clients
     }
 
-    // Attend clients request
-    @socket_select($copy_clients, $null, $null, 0, 10);
+    foreach($copy_clients as $client){ // Attend all clients requests
+		while(socket_recv($client, $buffer, 1024, 0) >= 1){ // Check for incomming data
+            $request = socket_decodeResponse($buffer); // Decode client's request
 
-    foreach($copy_clients as $client){
-        //check for any incomming data
-		while(socket_recv($client, $buffer, 1024, 0) >= 1){
-			// Decode client request
-            $request = json_decode(unmask($buffer), true);
-            socket_getpeername($client, $address);
+            if($request){ // If there's a request
+                socket_getpeername($client, $address); // Get ip address
 
-            switch($request->command){
-                // Personal message (Client to Client)
-                case 'private_message':
-                    $to_socket = socket_getPeerAddress($request->to);
+                switch($request->command){
+                    case 'private_message': // Personal message (Client to Client)
+                        $to_socket = socket_getPeerAddress($request->to); // Get destionation socket
+    
+                        if($to_socket){ // If the destionation socket exists
+                            $response = socket_encodeResponse(array(
+                                'command' => $request->command,
+                                'from' => $address,
+                                'message' => $request->message
+                            ));
+    
+                            socket_write($to_socket, $response, strlen($response)); // Send message
+                        }
 
-                    if($to_socket){
-                        $response = socket_formatResponse(array(
-                            'command' => $request->command,
-                            'from' => $address,
-                            'message' => $request->message
-                        ));
-
-                        socket_write($to_socket, $response, strlen($response));
-                    }
-
-                    break;
-                default:
+                        break;
+                    default:
+                }
             }
             
 			break 2;
 		}
 		
-        // Check disconnected client
 		$buffer = @socket_read($client, 1024, PHP_NORMAL_READ);
 
-		if (!$buffer) {
-            socket_getpeername($client, $address);
-
-			// remove client for $clients array
-			$index = array_search($client, $connected_clients);
-			unset($clients[$index]);
+		if ($buffer === false) { // If the client disconnected
+            socket_getpeername($client, $address); // Get ip address
+            socket_remove($client, $connected_clients); // Remove client for connected clients array
 			
-			//notify all users about disconnected connection
-            $response = socket_formatResponse(array(
+            $response = socket_encodeResponse(array(
                 'command' => 'disconnected_user',
                 'address' => $address
             ));
             
-            socket_sendForAll($response);
+            socket_sendForAll($response); // Notify all users about disconnected client
 		}
     }
 }
 
-socket_close($server_socket);
+socket_close($master); // Close master socket 

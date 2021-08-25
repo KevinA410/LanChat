@@ -2,6 +2,12 @@
 // Global variables
 $connected_clients = array();
 
+// Delete socket in specified array
+function socket_remove($socket, &$socket_array){
+	$index = array_search($socket, $socket_array);
+	unset($socket_array[$index]);
+}
+
 // Send message for specified group of clients
 function socket_sendForAll($message){
 	global $connected_clients;
@@ -9,28 +15,34 @@ function socket_sendForAll($message){
 	foreach($connected_clients as $client){
 		@socket_write($client, $message, strlen($message));
 	}
-	
+
 	return true;
 }
 
 // Get all ip addresses for connected clients
-function socket_getConnectedAddresses(){
+function socket_getClientsAddresses(){
 	global $connected_clients;
 	$connected_addresses = array();
 
 	foreach($connected_clients as $client){
 		socket_getpeername($client, $address);
 
-		if(!in_array($address, $connected_addresses))
+		if(!in_array($address, $connected_addresses)){
 			array_push($connected_addresses, $address);
+		}
 	}
-	
+
 	return $connected_addresses;
 }
 
-// Format the response to send
-function socket_formatResponse($response_array){
-	return mask(json_encode($response_array));
+// Encode the response to send
+function socket_encodeResponse($response){
+	return socket_mask(json_encode($response), true);
+}
+
+// Decode the recieve response
+function socket_decodeResponse($response){
+	return json_decode(socket_unmask($response), true);
 }
 
 // Get socket by ip address
@@ -49,7 +61,7 @@ function socket_getPeerAddress($address){
 }
 
 //Unmask incoming framed message
-function unmask($text)
+function socket_unmask($text)
 {
 	$length = ord($text[1]) & 127;
 	if ($length == 126) {
@@ -70,7 +82,7 @@ function unmask($text)
 }
 
 //Encode message for transfer to client.
-function mask($text)
+function socket_mask($text)
 {
 	$b1 = 0x80 | (0x1 & 0x0f);
 	$length = strlen($text);
@@ -85,7 +97,7 @@ function mask($text)
 }
 
 //handshake new client.
-function perform_handshaking($receved_header, $client_conn, $host, $port)
+function socket_handshaking($receved_header, $client_conn, $host, $port)
 {
 	$headers = array();
 	$lines = preg_split("/\r\n/", $receved_header);

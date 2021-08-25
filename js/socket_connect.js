@@ -3,7 +3,7 @@ $(document).ready(function () {
 
     $.ajax({
         async: false,
-        url: "http://192.168.0.110:8000/js/master.json",
+        url: "http://192.168.0.115:8000/js/master.json",
         success: function (json) {
             wsURL = json.wsURL;
         }
