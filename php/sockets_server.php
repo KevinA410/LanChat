@@ -52,15 +52,15 @@ while (true) { // Keep run
             if($request){ // If there's a request
                 socket_getpeername($client, $address); // Get ip address
 
-                switch($request->command){
+                switch($request['command']){
                     case 'private_message': // Personal message (Client to Client)
-                        $to_socket = socket_getPeerAddress($request->to); // Get destionation socket
+                        $to_socket = socket_getPeerAddress($request['to']); // Get destionation socket
     
                         if($to_socket){ // If the destionation socket exists
                             $response = socket_encodeResponse(array(
-                                'command' => $request->command,
+                                'command' => $request['command'],
                                 'from' => $address,
-                                'message' => $request->message
+                                'message' => $request['message']
                             ));
     
                             socket_write($to_socket, $response, strlen($response)); // Send message

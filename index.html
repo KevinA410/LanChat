@@ -77,31 +77,26 @@
             </div>
             <!-- Conversation panel -->
             <div class="col-9" id="right">
-                <!--Information card-->
-                <div class="card">
-                    <div class="row d-flex">
-                        <!--
-                        <div class="col-1 align-self-center">
-                            <img src="/img.jpg" class="card-img-top">
-                        </div>-->
-                        <div class="col-auto align-self-center">
-                            <div class="card-body">
-                                <h5 class="card-title">Card title</h5>
-                                <h6 id="destination_ip" class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                <div id="chat-flag">
+                    <!--Information card-->
+                    <div class="card">
+                        <div class="row d-flex">
+                            <div class="col-auto align-self-center">
+                                <div class="card-body">
+                                    <h6 id="destination_address" class="card-subtitle mb-2 text-muted"> </h6>
+                                </div>
                             </div>
                         </div>
-                    </div>    
-                </div>
-                <!-- messages container -->
-                <div id="messages" class="mt-2">
-
-                </div>
-                <!-- Send messages controls -->
-                <div class="" id="send-controls">
-                    <div class="input-group flex-nowrap">
-                        <input id="input_message" type="text" class="form-control" placeholder="Write here..."
-                            aria-describedby="addon-wrapping">
-                        <button id="btn_send" class="btn btn-primary">Send</button>
+                    </div>
+                    <!-- messages container -->
+                    <div id="messages" class="mt-2"> </div>
+                    <!-- Send messages controls -->
+                    <div class="" id="send-controls">
+                        <div class="input-group flex-nowrap">
+                            <input id="input_message" type="text" class="form-control" placeholder="Write here..."
+                                aria-describedby="addon-wrapping">
+                            <button id="btn_send" class="btn btn-primary">Send</button>
+                        </div>
                     </div>
                 </div>
             </div>
