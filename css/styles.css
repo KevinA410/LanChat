@@ -12,6 +12,15 @@
     display: inline-block;
 }
 
+.connected-notification {
+    width: auto;
+    height: auto;
+    padding: 3px;
+    background-color: skyblue;
+    color: red;
+    display: inline-block;
+}
+
 #left,
 #right {
     min-height: calc(100vh - 88px);

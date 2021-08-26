@@ -6,7 +6,7 @@ $(document).ready(function () {
 
     $.ajax({
         async: false,
-        url: "http://192.168.0.110:8000/js/master.json",
+        url: "http://192.168.0.115:8000/js/master.json",
         success: function (json) {
             wsURL = json.wsURL;
         }
@@ -27,10 +27,11 @@ $(document).ready(function () {
 
                 r.addresses.forEach(address => {
                     var id = address.replaceAll('.', '_');
-
+                    
                     $("#connected").append(html_newConnection(id, address));
-
+                    
                     $("#" + id).on('click', function () {
+                        setBadge(id, 0);
                         if(!currentChat){
                             setChat(true);
                         }
@@ -46,6 +47,7 @@ $(document).ready(function () {
                 $("#connected").append(html_newConnection(id, r.address));
 
                 $("#" + id).on('click', function () {
+                    setBadge(id, 0);
                     if(!currentChat){
                         setChat(true);
                     }
@@ -66,7 +68,13 @@ $(document).ready(function () {
                 break;
             case 'private_message':
                 saveMessage(r.message, r.from);
-                loadMessages(r.from);
+                
+                if(currentChat == r.from){
+                    loadMessages(r.from);
+                }else{
+                    var id = r.from.replaceAll('.', '_');
+                    setBadge(id, getBadge(id) + 1);
+                }
                 break;
             default:
                 console.log("There's no function for this command");
@@ -102,8 +110,22 @@ $(document).ready(function () {
         return `
             <div id="${id}">
                 <div class="connected-dot"></div>${address}
+                <span id="badge_${id}" class=""></span>
             </div>
         `;
+    }
+
+    function setBadge(id, number){
+        var cls = number > 0 ? 'badge rounded-pill bg-primary mb-1' : '';
+        var html = number > 0 ? number : '';
+        
+        $("#badge_" + id).attr('class', cls);
+        $("#badge_" + id).html(html);        
+    }
+
+    function getBadge(id){
+        var html = $("#badge_" + id).html();
+        return html == '' ? 0 : parseInt(html);
     }
 
     function setChat(option){
