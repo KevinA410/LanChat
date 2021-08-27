@@ -24,11 +24,11 @@ while (true) { // Keep run
 
         socket_getpeername($new_socket, $new_address); // Get ip of new socket
         $clients_addresses = socket_getClientsAddresses(); //Get ip of connected clients
-        array_push($clients_addresses, $new_address); // Add new ip from clients ip array
 
         // New user recieves all connected ips
         $response = socket_encodeResponse(array(
             'command' => 'connected_users',
+            'own_address' => $new_address,
             'addresses' => $clients_addresses
         ));
 
@@ -55,14 +55,25 @@ while (true) { // Keep run
                 switch($request['command']){
                     case 'private_message': // Personal message (Client to Client)
                         $to_socket = socket_getPeerAddress($request['to']); // Get destionation socket
+                        $dt = new DateTime();
+                        $hour = $dt->format('H') . ':' . $dt->format('i');
     
                         if($to_socket){ // If the destionation socket exists
+                            $callback = socket_encodeResponse(array(
+                                'command' => 'verfied_message',
+                                'to' => $request['to'],
+                                'message' => $request['message'],
+                                'hour' => $hour
+                            ));
+
                             $response = socket_encodeResponse(array(
                                 'command' => $request['command'],
                                 'from' => $address,
-                                'message' => $request['message']
+                                'message' => $request['message'],
+                                'hour' => $hour
                             ));
-    
+                            
+                            socket_write($client, $callback, strlen($callback)); // Send message
                             socket_write($to_socket, $response, strlen($response)); // Send message
                         }
 

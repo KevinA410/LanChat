@@ -1,33 +1,35 @@
-#main_container {
-    min-height: calc(100vh - 88px);
-}
-
-.connected-dot {
+.connected-dot, .disconnected-dot {
     width: 8px;
     height: 8px;
     margin-bottom: 2px;
     border-radius: 50%;
-    background-color: green;
     margin-right: 5px;
     display: inline-block;
 }
 
-.connected-notification {
-    width: auto;
-    height: auto;
-    padding: 3px;
-    background-color: skyblue;
-    color: red;
-    display: inline-block;
+.connected-dot {
+    background-color: green;
 }
 
-#left,
-#right {
-    min-height: calc(100vh - 88px);
-    /* background-color: green;  */
+.disconnected-dot {
+    background-color: red;
+}
+
+#left, #right {
+    min-height: calc(100vh - 96px);
+    max-height: calc(100vh - 96px);
 }
 
 #messages {
-    /* background-color: grey; */
-    min-height: calc(100vh - 235px);
+    min-height: calc(100vh - 220px);
+    max-height: calc(100vh - 220px);
+}
+
+#left, #messages {
+    overflow-y: auto;
+}
+
+/* General */
+.font {
+    color: white;
 }
