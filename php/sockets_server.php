@@ -2,6 +2,8 @@
 include_once('socket_lib.php'); // Include socket librery
 $master_info = json_decode(file_get_contents("../js/master.json")); // Get socket master info from Json
 
+
+
 $master = socket_create(AF_INET, SOCK_STREAM, SOL_TCP); // Create socket TCP
 socket_set_option($master, SOL_SOCKET, SO_REUSEADDR, true); // Enable reusable port
 socket_bind($master, $master_info->address, $master_info->port); // Connect port to master info
@@ -22,14 +24,19 @@ while (true) { // Keep run
         $header = socket_read($new_socket, 1024); // Get header
         socket_handshaking($header, $new_socket, $master_info->address, $master_info->port); // Link to master
 
+        $clients_info = socket_getClientsInfo(); //Get ip of connected clients
         socket_getpeername($new_socket, $new_address); // Get ip of new socket
-        $clients_addresses = socket_getClientsAddresses(); //Get ip of connected clients
+        $username = generete_username($new_address);
+
+        var_dump($username);
+
 
         // New user recieves all connected ips
         $response = socket_encodeResponse(array(
             'command' => 'connected_users',
             'own_address' => $new_address,
-            'addresses' => $clients_addresses
+            'own_name' => $username,
+            'clients' => $clients_info
         ));
 
         socket_write($new_socket, $response, strlen($response)); // Send response
@@ -37,11 +44,15 @@ while (true) { // Keep run
         // Already connected users recieve only the new connection's ip
         $response = socket_encodeResponse(array(
             'command' => 'new_connection',
+            'username' => $username,
             'address' => $new_address
         ));
 
         socket_sendForAll($response); // Send response for all connected users
+
         array_push($connected_clients, $new_socket); // Add new user to connected clients array
+        $client_names[$new_address] = $username;     
+
         socket_remove($master, $copy_clients); // Remove master from $copy_clients
     }
 

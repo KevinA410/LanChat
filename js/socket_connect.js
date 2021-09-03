@@ -12,7 +12,7 @@ $(document).ready(function () {
 
     $.ajax({
         async: false,
-        url: "http://192.168.0.115:8000/js/master.json",
+        url: "http://192.168.0.102:8000/js/master.json",
         success: function (json) {
             wsURL = json.wsURL;
         }
@@ -30,14 +30,15 @@ $(document).ready(function () {
 
         switch (r.command) {
             case 'connected_users':
+                $("#user_name").html(r.own_name);
                 $("#user_address").html(r.own_address);
 
                 $("#connected").html(' ');
 
-                r.addresses.forEach(address => {
-                    var id = address.replaceAll('.', '_');
+                r.clients.forEach(client => {
+                    var id = client.address.replaceAll('.', '_');
 
-                    $("#connected").append(html_newConnection(id, address));
+                    $("#connected").append(html_newConnection(id, client.username, client.address));
 
                     $("#" + id).on('click', function () {
                         setBadge(id, 0);
@@ -57,7 +58,7 @@ $(document).ready(function () {
             case 'new_connection':
                 var id = r.address.replaceAll('.', '_');
 
-                $("#connected").append(html_newConnection(id, r.address));
+                $("#connected").append(html_newConnection(id, r.username, r.address));
 
                 $("#" + id).on('click', function () {
                     setBadge(id, 0);
@@ -139,11 +140,14 @@ $(document).ready(function () {
 
 
     // Auxiliar functions
-    function html_newConnection(id, address) {
+    function html_newConnection(id, username, address) {
         return `
-            <div id="${id}" class="mb-3">
-                <div class="connected-dot"></div>${address}
-                <span id="badge_${id}" class=""></span>
+            <div id="${id}" class="card py-3 shadow-sm px-3 mb-3">
+                <h5 class="h6 mb-1">${username} <span id="badge_${id}" class=""></span></h5>
+                <h5 class="h6 text-muted">
+                    <div id="dot" class="connected-dot"></div>
+                    ${address}
+                </h6>
             </div>
         `;
     }

@@ -1,17 +1,32 @@
 <?php
-// Global variables
-$connected_clients = array();
+$connected_clients = array(); // Storage all socket connections
+$client_names  = array(); // Storage clients names [key = ip_address, value = name]
+
+// Generate a username which has not been assigned
+function generete_username($address){
+	global $client_names;
+
+	$aux = 'User';
+	$name = '';
+
+	do{
+		$name = $aux . rand(0, 10000);
+	}while(in_array($name, $client_names));
+
+	return $name;
+}
 
 // Delete socket in specified array
 function socket_remove($socket, &$socket_array){
 	$index = array_search($socket, $socket_array);
 	unset($socket_array[$index]);
+	$socket_array = array_values($socket_array);
 }
 
 // Send message for specified group of clients
 function socket_sendForAll($message){
 	global $connected_clients;
-	
+
 	foreach($connected_clients as $client){
 		@socket_write($client, $message, strlen($message));
 	}
@@ -20,19 +35,23 @@ function socket_sendForAll($message){
 }
 
 // Get all ip addresses for connected clients
-function socket_getClientsAddresses(){
-	global $connected_clients;
-	$connected_addresses = array();
+function socket_getClientsInfo(){
+	global $connected_clients, $client_names;
+
+	$clients_info = array();
 
 	foreach($connected_clients as $client){
 		socket_getpeername($client, $address);
 
-		if(!in_array($address, $connected_addresses)){
-			array_push($connected_addresses, $address);
+		if(!in_array($address, $clients_info)){
+			array_push($clients_info, array(
+				'username' => $client_names[$address],
+				'address' => $address
+			));
 		}
 	}
 
-	return $connected_addresses;
+	return $clients_info;
 }
 
 // Encode the response to send

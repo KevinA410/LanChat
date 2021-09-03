@@ -18,19 +18,20 @@
         <!-- </div> -->
         <!-- Connected users -->
         <div class="">
+            <span class="d-block h5 mt-4">You</span>
             <!-- User information -->
-            <div class="card py-3 shadow-sm">
-                <h2 class="card-title text-center">
+            <div class="card py-3 shadow px-3">
+                <h4 class="h5"><strong id="user_name">UnknownUser13</strong></h4>
+                <h5 class="h6 text-muted">
                     <div id="dot" class="connected-dot"></div>
-                    <span class="text-muted">You: </span>
-                    <strong id="user_address"></strong>
-                </h2>
+                    <span id="user_address"></span>
+                </h5>
             </div>
             <!-- Title -->
             <span class="d-block h5 mt-4">Connected</span>
             <hr class="mt-0">
             <!-- Connected clients -->
-            <div id="connected" class="ms-3">
+            <div id="connected" class="">
 
             </div>
         </div>
