@@ -15,7 +15,7 @@
     background-color: red;
 }
 
-#left, #right {
+#left, #right, #settings_container {
     min-height: calc(100vh - 96px);
     max-height: calc(100vh - 96px);
 }

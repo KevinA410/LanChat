@@ -1,4 +1,4 @@
-<?php include_once('views/layout.php')?>
+<?php include_once('layout.php')?>
 <?php layout_begin() ?>
 
 <!-- Index content -->
