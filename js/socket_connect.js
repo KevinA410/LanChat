@@ -45,9 +45,12 @@ $(document).ready(function () {
                         if (!currentChat) {
                             setChat(true);
                         }
-                        $("#destination_address").html(address);
-                        currentChat = address;
-                        loadMessages(address);
+
+                        $("#destination_name").html(client.username);
+                        $("#destination_address").html(client.address);
+
+                        currentChat = client.address;
+                        loadMessages(client.address);
                         
                         if(!isLg){
                             $("#btn_slide").click();
@@ -65,7 +68,10 @@ $(document).ready(function () {
                     if (!currentChat) {
                         setChat(true);
                     }
+
+                    $("#destination_name").html(r.username);
                     $("#destination_address").html(r.address);
+
                     currentChat = r.address;
                     loadMessages(r.address);
 
@@ -191,10 +197,12 @@ $(document).ready(function () {
             new Array();
 
         conv.forEach(item => {
+            var user = item.from == 'You' ? item.from : $("#destination_name").html();
+
             raw += `
                 <div class="card my-2 p-2">
                     <p class="card-text mb-0 pb-0">
-                        <span class="text-muted">${item.from}: </span>${item.message}
+                        <span class="text-muted">${user}: </span>${item.message}
                     </p>
                     <p class="text-end my-0 py-0"><small class="text-muted">Sent at ${item.hour}</small></p>
                 </div>

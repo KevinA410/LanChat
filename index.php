@@ -18,10 +18,10 @@
         <!-- </div> -->
         <!-- Connected users -->
         <div class="">
-            <span class="d-block h5 mt-4">You</span>
+            <span class="d-block h5">You</span>
             <!-- User information -->
             <div class="card py-3 shadow px-3">
-                <h4 class="h5"><strong id="user_name">UnknownUser13</strong></h4>
+                <h4 class="h5"><strong id="user_name"></strong></h4>
                 <h5 class="h6 text-muted">
                     <div id="dot" class="connected-dot"></div>
                     <span id="user_address"></span>
@@ -41,11 +41,12 @@
     <div class="col-12 col-lg-9" id="right" hidden>
         <div id="chat-flag">
             <!-- Information card -->
-            <div class="card my-0 py-3 shadow-sm">
-                <h2 class="card-title text-center">
-                    <div class="connected-dot"></div>
-                    <strong id="destination_address"></strong>
-                </h2>
+            <div class="card py-3 shadow px-3">
+                <h4 class="h5"><strong id="destination_name"></strong></h4>
+                <h5 class="h6 text-muted">
+                    <div id="dot" class="connected-dot"></div>
+                    <span id="destination_address"></span>
+                </h5>
             </div>
 
             <!-- messages container -->

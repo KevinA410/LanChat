@@ -28,9 +28,6 @@ while (true) { // Keep run
         socket_getpeername($new_socket, $new_address); // Get ip of new socket
         $username = generete_username($new_address);
 
-        var_dump($username);
-
-
         // New user recieves all connected ips
         $response = socket_encodeResponse(array(
             'command' => 'connected_users',
